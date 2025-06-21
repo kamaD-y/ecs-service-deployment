@@ -69,18 +69,10 @@ class ExistingResourceConstructor(Construct):
                 )
             self.clusters.append(cluster_info)
 
-    def load_existing_resources(
-        self,
-        vpc_id: str = None,
-        sg_ids: list = [],
-        cluster_services_glob_path: str = None,
-    ) -> None:
-        if vpc_id:
-            self._load_existing_vpc(vpc_id)
-        if sg_ids:
-            self._load_existing_security_groups(sg_ids)
-        if cluster_services_glob_path:
-            self._load_existing_clusters(cluster_services_glob_path)
+    def load_existing_resources(self, vpc_id: str, sg_ids: list, cluster_services_glob_path: str) -> None:
+        self._load_existing_vpc(vpc_id)
+        self._load_existing_security_groups(sg_ids)
+        self._load_existing_clusters(cluster_services_glob_path)
         # print(self.clusters)
         """
         [{
