@@ -1,0 +1,13 @@
+{
+  "editor.formatOnSave": true,
+  "editor.useTabStops": false,
+  "files.insertFinalNewline": true,
+  "ruff.configurationPreference": "filesystemFirst",
+  "mypy-type-checker.args": ["--config-file=${workspaceFolder}/pyproject.toml"],
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit"
+    },
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  }
+}
