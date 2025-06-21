@@ -1,8 +1,25 @@
 import glob
-import yaml
 from pathlib import Path
-from aws_cdk import Stack, aws_ec2 as ec2, aws_ecs as ecs, CfnOutput
+from typing import List, Optional, TypedDict
+
+import yaml
+from aws_cdk import CfnOutput, Stack
+from aws_cdk import aws_ec2 as ec2
+from aws_cdk import aws_ecs as ecs
 from constructs import Construct
+
+
+class ClusterService(TypedDict):
+    service_name: str
+    task_arn: str
+    desired_count: int
+    task_definition: ecs.ITaskDefinition
+
+
+class ClusterInfo(TypedDict):
+    name: str
+    cluster: ecs.ICluster
+    services: List[ClusterService]
 
 
 # 既存リソースを取得するコンストラクタ
@@ -11,29 +28,26 @@ class ExistingResourceConstructor(Construct):
         self,
         scope: Construct,
         id: str,
-        vpc_id: str = None,
-        sg_ids: list = [],
-        cluster_services_glob_path: str = None,
+        vpc_id: str,
+        sg_ids: List[str],
+        cluster_services_glob_path: str,
     ) -> None:
         super().__init__(scope, id)
-        self.vpc: ec2.IVpc = None
-        self.security_groups: list[ec2.ISecurityGroup] = []
-        self.clusters = []
-        self.task_definitions = []
+        self.vpc: Optional[ec2.IVpc] = None
+        self.security_groups: List[ec2.ISecurityGroup] = []
+        self.clusters: List[ClusterInfo] = []
         self.load_existing_resources(vpc_id, sg_ids, cluster_services_glob_path)
 
-    def _load_existing_vpc(self, vpc_id: str):
+    def _load_existing_vpc(self, vpc_id: str) -> None:
         self.vpc = ec2.Vpc.from_lookup(self, "ImportedVpc", vpc_id=vpc_id)
 
-    def _load_existing_security_groups(self, sg_ids: list):
+    def _load_existing_security_groups(self, sg_ids: list) -> None:
         for i, sg_id in enumerate(sg_ids):
             self.security_groups.append(
-                ec2.SecurityGroup.from_security_group_id(
-                    self, f"ImportedSecurityGroup{i}", security_group_id=sg_id
-                )
+                ec2.SecurityGroup.from_security_group_id(self, f"ImportedSecurityGroup{i}", security_group_id=sg_id)
             )
 
-    def _load_existing_clusters(self, cluster_services_glob_path: str):
+    def _load_existing_clusters(self, cluster_services_glob_path: str) -> None:
         for file_path in glob.glob(cluster_services_glob_path):
             cluster_info = {}
             cluster_name = Path(file_path).stem
@@ -48,12 +62,10 @@ class ExistingResourceConstructor(Construct):
             with open(file_path, "r") as file:
                 cluster_info["services"] = yaml.safe_load(file)
             for service in cluster_info["services"]:
-                service["task_definition"] = (
-                    ecs.TaskDefinition.from_task_definition_arn(
-                        self,
-                        f"ImportedTaskDef-{cluster_name}-{service['service_name']}",
-                        task_definition_arn=service["task_arn"],
-                    )
+                service["task_definition"] = ecs.TaskDefinition.from_task_definition_arn(
+                    self,
+                    f"ImportedTaskDef-{cluster_name}-{service['service_name']}",
+                    task_definition_arn=service["task_arn"],
                 )
             self.clusters.append(cluster_info)
 
@@ -62,7 +74,7 @@ class ExistingResourceConstructor(Construct):
         vpc_id: str = None,
         sg_ids: list = [],
         cluster_services_glob_path: str = None,
-    ):
+    ) -> None:
         if vpc_id:
             self._load_existing_vpc(vpc_id)
         if sg_ids:
@@ -91,17 +103,15 @@ class ExistingResourceConstructor(Construct):
 
 
 class EcsClustersStack(Stack):
-    def __init__(
-        self, scope: Construct, construct_id: str, parameters, **kwargs
-    ) -> None:
+    def __init__(self, scope: Construct, construct_id: str, parameters, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         """
         既存リソース参照
         """
-        vpc_id = parameters.get("vpc_id")
-        sg_ids = parameters.get("sg_ids", [])
-        cluster_services_glob_path = parameters.get("cluster_services_glob_path")
+        vpc_id = parameters["vpc_id"]
+        sg_ids = parameters["sg_ids"]
+        cluster_services_glob_path = parameters["cluster_services_glob_path"]
 
         existing_resource = ExistingResourceConstructor(
             self, "ExistingResources", vpc_id, sg_ids, cluster_services_glob_path
@@ -147,9 +157,7 @@ class EcsClustersStack(Stack):
                     assign_public_ip=True,  # 必要に応じて設定
                 )
                 # 既存のタスク定義を関連付けし直す
-                fargate_service.node.try_find_child(
-                    "Service"
-                ).task_definition = cluster_service[
+                fargate_service.node.try_find_child("Service").task_definition = cluster_service[
                     "task_definition"
                 ].task_definition_arn
 
