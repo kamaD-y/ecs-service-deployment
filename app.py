@@ -3,7 +3,7 @@ import os
 
 import aws_cdk as cdk
 
-from cdk_ecs_clusters.cdk_ecs_clusters_stack import EcsClustersStack
+from ecs_clusters.ecs_clusters_stack import EcsClustersStack
 
 app = cdk.App()
 EcsClustersStack(
