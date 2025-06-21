@@ -22,7 +22,7 @@ ECS サービスの展開を効率化する為の CDK のサンプルです。
 
 # デプロイ
 
-`app.py`に作成済の VPC-ID, SECURITY-GROUP-ID を記述します。
+`app.py`に作成済の VPC-ID, SECURITY-GROUP-ID を記述の上以下コマンドを実行します。
 
 ```sh
 # 差分確認
