@@ -1,14 +1,33 @@
-# Welcome to your CDK TypeScript project
+# 概要
+ECS サービスの展開を効率化する為の CDK のサンプルです。
 
-This is a blank project for CDK development with TypeScript.
+以下が既に AWS 環境に作成済であることを想定しています。
+- ECS クラスター
+- タスク定義
+- VPC
+- SecurityGroup
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+# 利用手順
 
-## Useful commands
+`config/cluster-services` に以下ルールでクラスター毎にファイルを作成します。
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
+- `<クラスター名>.yml`
+```yaml
+- service_name: <サービス名>
+  task_arn: <タスク定義 ARN(リビジョン番号含む)>
+  desired_count: <指定タスクの実行数>
+```
+
+※リビジョン番号を指定しない場合は最新リビジョンがデプロイされますが、2回目以降差分が判別できなくなる点は非対応です。
+
+# デプロイ
+
+`app.py`に作成済の VPC-ID, SECURITY-GROUP-ID を記述します。
+
+```sh
+# 差分確認
+$ cdk diff
+
+# デプロイ
+$ cdk deploy
+```
