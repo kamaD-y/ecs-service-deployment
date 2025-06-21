@@ -15,9 +15,7 @@ EcsClustersStack(
         "cluster_services_glob_path": "config/cluster-services/*.yml",
     },
     # ap-northeast-1リージョンを指定
-    env=cdk.Environment(
-        account=os.getenv("CDK_DEFAULT_ACCOUNT"), region="ap-northeast-1"
-    ),
+    env=cdk.Environment(account=os.getenv("CDK_DEFAULT_ACCOUNT"), region="ap-northeast-1"),
 )
 
 app.synth()
