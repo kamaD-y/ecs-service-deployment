@@ -1,0 +1,215 @@
+# serializer version: 1
+# name: test_snapshot
+  dict({
+    'Outputs': dict({
+      'ServiceARNfargatecluster1fargateservice1': dict({
+        'Description': 'ARN of the fargate-service-1 service',
+        'Value': dict({
+          'Ref': 'FargateServicefargatecluster1fargateservice1ServiceA2DA3509',
+        }),
+      }),
+      'ServiceARNfargatecluster2fargateservice1': dict({
+        'Description': 'ARN of the fargate-service-1 service',
+        'Value': dict({
+          'Ref': 'FargateServicefargatecluster2fargateservice1ServiceA37EF0FF',
+        }),
+      }),
+    }),
+    'Parameters': dict({
+      'BootstrapVersion': dict({
+        'Default': '/cdk-bootstrap/hnb659fds/version',
+        'Description': 'Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]',
+        'Type': 'AWS::SSM::Parameter::Value<String>',
+      }),
+    }),
+    'Resources': dict({
+      'DefaultTaskDefF829348D': dict({
+        'Properties': dict({
+          'ContainerDefinitions': list([
+            dict({
+              'Cpu': 256,
+              'Essential': True,
+              'Image': 'amazon/amazon-ecs-sample',
+              'Memory': 512,
+              'Name': 'DefaultContainer',
+            }),
+          ]),
+          'Cpu': '256',
+          'Family': 'DefaultTaskDef',
+          'Memory': '512',
+          'NetworkMode': 'awsvpc',
+          'RequiresCompatibilities': list([
+            'FARGATE',
+          ]),
+          'TaskRoleArn': dict({
+            'Fn::GetAtt': list([
+              'DefaultTaskDefTaskRoleD38D9022',
+              'Arn',
+            ]),
+          }),
+        }),
+        'Type': 'AWS::ECS::TaskDefinition',
+      }),
+      'DefaultTaskDefTaskRoleD38D9022': dict({
+        'Properties': dict({
+          'AssumeRolePolicyDocument': dict({
+            'Statement': list([
+              dict({
+                'Action': 'sts:AssumeRole',
+                'Effect': 'Allow',
+                'Principal': dict({
+                  'Service': 'ecs-tasks.amazonaws.com',
+                }),
+              }),
+            ]),
+            'Version': '2012-10-17',
+          }),
+        }),
+        'Type': 'AWS::IAM::Role',
+      }),
+      'FargateServicefargatecluster1fargateservice1SecurityGroup0786FAFE': dict({
+        'DependsOn': list([
+          'DefaultTaskDefTaskRoleD38D9022',
+        ]),
+        'Properties': dict({
+          'GroupDescription': 'ecs-clusters/FargateService-fargate-cluster-1-fargate-service-1/SecurityGroup',
+          'SecurityGroupEgress': list([
+            dict({
+              'CidrIp': '0.0.0.0/0',
+              'Description': 'Allow all outbound traffic by default',
+              'IpProtocol': '-1',
+            }),
+          ]),
+          'VpcId': 'vpc-12345',
+        }),
+        'Type': 'AWS::EC2::SecurityGroup',
+      }),
+      'FargateServicefargatecluster1fargateservice1ServiceA2DA3509': dict({
+        'DependsOn': list([
+          'DefaultTaskDefTaskRoleD38D9022',
+        ]),
+        'Properties': dict({
+          'Cluster': 'fargate-cluster-1',
+          'DeploymentConfiguration': dict({
+            'Alarms': dict({
+              'AlarmNames': list([
+              ]),
+              'Enable': False,
+              'Rollback': False,
+            }),
+            'MaximumPercent': 200,
+            'MinimumHealthyPercent': 50,
+          }),
+          'DesiredCount': 1,
+          'EnableECSManagedTags': False,
+          'LaunchType': 'FARGATE',
+          'NetworkConfiguration': dict({
+            'AwsvpcConfiguration': dict({
+              'AssignPublicIp': 'ENABLED',
+              'SecurityGroups': list([
+                dict({
+                  'Fn::GetAtt': list([
+                    'FargateServicefargatecluster1fargateservice1SecurityGroup0786FAFE',
+                    'GroupId',
+                  ]),
+                }),
+              ]),
+              'Subnets': list([
+                's-12345',
+                's-67890',
+              ]),
+            }),
+          }),
+          'ServiceName': 'fargate-service-1',
+          'TaskDefinition': 'arn:aws:ecs:ap-northeast-1:123456789012:task-definition/task-1',
+        }),
+        'Type': 'AWS::ECS::Service',
+      }),
+      'FargateServicefargatecluster2fargateservice1SecurityGroupB6718C5A': dict({
+        'DependsOn': list([
+          'DefaultTaskDefTaskRoleD38D9022',
+        ]),
+        'Properties': dict({
+          'GroupDescription': 'ecs-clusters/FargateService-fargate-cluster-2-fargate-service-1/SecurityGroup',
+          'SecurityGroupEgress': list([
+            dict({
+              'CidrIp': '0.0.0.0/0',
+              'Description': 'Allow all outbound traffic by default',
+              'IpProtocol': '-1',
+            }),
+          ]),
+          'VpcId': 'vpc-12345',
+        }),
+        'Type': 'AWS::EC2::SecurityGroup',
+      }),
+      'FargateServicefargatecluster2fargateservice1ServiceA37EF0FF': dict({
+        'DependsOn': list([
+          'DefaultTaskDefTaskRoleD38D9022',
+        ]),
+        'Properties': dict({
+          'Cluster': 'fargate-cluster-2',
+          'DeploymentConfiguration': dict({
+            'Alarms': dict({
+              'AlarmNames': list([
+              ]),
+              'Enable': False,
+              'Rollback': False,
+            }),
+            'MaximumPercent': 200,
+            'MinimumHealthyPercent': 50,
+          }),
+          'DesiredCount': 1,
+          'EnableECSManagedTags': False,
+          'LaunchType': 'FARGATE',
+          'NetworkConfiguration': dict({
+            'AwsvpcConfiguration': dict({
+              'AssignPublicIp': 'ENABLED',
+              'SecurityGroups': list([
+                dict({
+                  'Fn::GetAtt': list([
+                    'FargateServicefargatecluster2fargateservice1SecurityGroupB6718C5A',
+                    'GroupId',
+                  ]),
+                }),
+              ]),
+              'Subnets': list([
+                's-12345',
+                's-67890',
+              ]),
+            }),
+          }),
+          'ServiceName': 'fargate-service-1',
+          'TaskDefinition': 'arn:aws:ecs:ap-northeast-1:123456789012:task-definition/task-1:3',
+        }),
+        'Type': 'AWS::ECS::Service',
+      }),
+    }),
+    'Rules': dict({
+      'CheckBootstrapVersion': dict({
+        'Assertions': list([
+          dict({
+            'Assert': dict({
+              'Fn::Not': list([
+                dict({
+                  'Fn::Contains': list([
+                    list([
+                      '1',
+                      '2',
+                      '3',
+                      '4',
+                      '5',
+                    ]),
+                    dict({
+                      'Ref': 'BootstrapVersion',
+                    }),
+                  ]),
+                }),
+              ]),
+            }),
+            'AssertDescription': "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+          }),
+        ]),
+      }),
+    }),
+  })
+# ---
